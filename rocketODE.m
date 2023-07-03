@@ -1,6 +1,7 @@
 function dxdt = rocketODE(t, x)
     position = [x(1), x(2), x(3)];
     quaternion = [x(4), x(5), x(6), x(7)];
+    quaternion = quaternion ./ norm(quaternion);
     Lvelocity = [x(8), x(9), x(10)];
     Avelocity = [x(11), x(12), x(13)];
     dxdt = zeros(13,1);
@@ -20,8 +21,8 @@ function dxdt = rocketODE(t, x)
     dampDC = 4.88;
     %stability = 0.408;
 
-    wind = [0,0,10]; %constant for now
-    e_roll = [0,0,1]; %roll axis
+    wind = [0,0,2]; %constant for now
+    ref_roll = [0,0,1]; %roll axis
     CoP = [0,0,0.2]; %dist from CoM, arbritrary for now
     g = [0,0,-9.81]; %gravity, check sign and compute actual vector later
 
@@ -43,6 +44,12 @@ function dxdt = rocketODE(t, x)
     %v dot
     Fg = massB.*g;
 
+    R = quat2rotm(quaternion);
+    e_roll = (R*ref_roll')';
+    var_w = 1.8*2^2*(position(3)/500)^(2/3) * (1 - 0.8 * position(3)/500)^2;
+    std_w = sqrt(var_w);
+    wind = [0, 0, normrnd(0,std_w)]; % this improved alt -- investigate
+
     V_cop = position + cross(Avelocity, (CoP - position));
     V_app = V_cop + wind;
     n_Vapp = V_app ./ norm(V_app);
@@ -63,7 +70,7 @@ function dxdt = rocketODE(t, x)
     dxdt(10) = vdot(3);
 
     %w dot
-    R = quat2rotm(quaternion);
+    
     stability = norm(CoP - position);
     torque_n = (stability * norm(Fn)) .* cross(e_roll, V_app);
     torque_damp = (-1*dampDC).*(R*diag([1 1 0])/R)*Lvelocity';

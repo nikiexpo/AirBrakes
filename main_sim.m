@@ -17,8 +17,23 @@ clear; clc;
 %     Vel(i,:) = x.linearVelocity';
 % end
 
-x0 = [[0, 0, 232], [1, 0, 0, 0], [0, 0, 166], [0.3, 0, 0.2]];
+x0 = [[0, 0, 232], [1, 0, 0, 0], [0, 0, 166], [0, 0, 0]];
 
 tspan = [0 5];
 %Use ode15s, ode45 took too long, probably cause the system is stiff
 [t,y] = ode15s(@rocketODE, tspan, x0);
+
+%% Plotting
+figure(1)
+plot3(y(:,1), y(:,2), y(:,3))
+title("Trajectory")
+%axis([0 40 0 40 0 400])
+xlabel("X disp")
+ylabel("Y disp")
+zlabel("Height")
+grid on
+
+figure(2)
+plot(y(:,10), y(:,3))
+title("Altitude vs Speed")
+grid on
