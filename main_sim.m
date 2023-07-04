@@ -19,9 +19,10 @@ clear; clc;
 
 x0 = [[0, 0, 232], [1, 0, 0, 0], [0, 0, 166], [0, 0, 0]];
 
-tspan = [0 5];
+tspan = [0 25];
 %Use ode15s, ode45 took too long, probably cause the system is stiff
-[t,y] = ode15s(@rocketODE, tspan, x0);
+options = odeset("RelTol",1e-4, "AbsTol", 1e-4, "Events",@Event);
+[t,y] = ode15s(@rocketODE, tspan, x0, options);
 
 %% Plotting
 figure(1)
@@ -34,6 +35,6 @@ zlabel("Height")
 grid on
 
 figure(2)
-plot(y(:,10), y(:,3))
+plot(y(:,10), y(:,3),"-o")
 title("Altitude vs Speed")
 grid on
