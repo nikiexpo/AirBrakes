@@ -1,6 +1,17 @@
 # AirBrakes
 Simulation "working", not great, oscillations in the 3D plot, XY directions are not resolved correctly. 
 
+MATLAB simulation is dodgy:
+    1. Either fix the bugs with the current solver
+    2. Or try implementing the solver
+
+RocketPy:
+    1. No support for airbrakes as of now
+    2. So probably need to edit source for this (difficult)
+    3. Need to find a trajectory optimisation tool box for this in python
+
+
+
 Things to note (needs changing/wrong /correct  etc):
 1. Not updating the roll axis (check Page 13 of the 6DoF paper) -- DONE but still same - but the variations are very small in X and Y dir, investigate
 2. Include variations in atmos properties (not a priority)
