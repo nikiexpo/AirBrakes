@@ -25,28 +25,28 @@ tomorrow = datetime.date.today() + datetime.timedelta(days=1)
 env.setDate((tomorrow.year,tomorrow.month,tomorrow.day,12))
 env.setAtmosphericModel(type="Forecast", file="GFS")
 
-Pro75M1670 = SolidMotor(
-    thrustSource="RocketPy_tutorial/Cesaroni_M1670.eng",
-    burnOut=3.9,
-    grainNumber=5,
-    grainSeparation=5 / 1000,
+J460 = SolidMotor(
+    thrustSource="AeroTech_J460T.eng",
+    burnOut=1.8,
+    grainNumber=3,
+    grainSeparation=3 / 1000,
     grainDensity=1815,
-    grainOuterRadius=33 / 1000,
+    grainOuterRadius=22 / 1000,
     grainInitialInnerRadius=15 / 1000,
-    grainInitialHeight=120 / 1000,
-    nozzleRadius=33 / 1000,
-    throatRadius=11 / 1000,
+    grainInitialHeight= 230 / 1000,
+    nozzleRadius=54 / 1000,
+    throatRadius=0.0079502,
     interpolationMethod="linear",
 )
 
 Calisto = Rocket(
-    motor=Pro75M1670,
-    radius=127 / 2000,
-    mass=19.197 - 2.956,
-    inertiaI=6.60,
-    inertiaZ=0.0351,
-    distanceRocketNozzle=-1.255,
-    distanceRocketPropellant=-0.85704,
+    motor=J460,
+    radius=0.05,
+    mass=4.25 - 0.415,
+    inertiaI= 4.6,
+    inertiaZ=0.035,
+    distanceRocketNozzle=-0.7,
+    distanceRocketPropellant=-0.5,
     powerOffDrag=DragWithAirBrakes(),
     powerOnDrag="RocketPy_tutorial/powerOnDragCurve.csv",
 )
@@ -60,15 +60,13 @@ FinSet = Calisto.addTrapezoidalFins(
     rootChord=0.120,
     tipChord=0.040,
     span=0.100,
-    distanceToCM=-1.04956,
+    distanceToCM=-0.54956,
     cantAngle=0,
     radius=None,
     airfoil=None,
 )
 
-Tail = Calisto.addTail(
-    topRadius=0.0635, bottomRadius=0.0435, length=0.060, distanceToCM=-1.194656
-)
+"""
 
 def drogueTrigger(p, y):
     # p = pressure
@@ -102,6 +100,7 @@ Drogue = Calisto.addParachute(
     noise=(0, 8.3, 0.5),
 )
 
+
+"""
 TestFlight = Flight(rocket=Calisto, environment=env, inclination=85, heading=0, terminateOnApogee=True)
 TestFlight.allInfo()
-

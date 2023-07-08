@@ -20,10 +20,11 @@ clear; clc;
 x0 = [[0, 0, 232], [1, 0, 0, 0], [0, 0, 166], [0, 0, 0]];
 
 tspan = [0 25];
+h = 0.4;
 %Use ode15s, ode45 took too long, probably cause the system is stiff
-options = odeset("RelTol",1e-4, "AbsTol", 1e-4, "Events",@Event);
-[t,y] = ode15s(@rocketODE, tspan, x0, options);
-
+% options = odeset("RelTol",1e-4, "AbsTol", 1e-4, "Events",@Event);
+% [t,y] = ode15s(@rocketODE, tspan, x0, options);
+[t,y] = solver(@rocketODE, tspan, x0, h);
 %% Plotting
 figure(1)
 plot3(y(:,1), y(:,2), y(:,3))

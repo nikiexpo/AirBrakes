@@ -5,7 +5,7 @@ function dxdt = rocketODE(t, x)
     Lvelocity = [x(8), x(9), x(10)];
     Avelocity = [x(11), x(12), x(13)];
 
-    dxdt = zeros(13,1); %allocate memory
+    dxdt = zeros(1,13); %allocate memory
 
     %constants
     massB = 4.2525;
@@ -23,7 +23,7 @@ function dxdt = rocketODE(t, x)
     dampDC = 4.88;
     %stability = 0.408;
 
-    wind = [0,0,0]; %constant for now
+    %wind = [0,0,0]; %constant for now
     ref_roll = [0,0,1]; %roll axis
     CoP = [0,0,-0.3]; %dist from CoM, arbritrary for now -- soruce for discrepancies
     g = [0,0,-9.81]; %gravity
@@ -51,7 +51,9 @@ function dxdt = rocketODE(t, x)
 
     var_w = 1.8*2^2*(position(3)/500)^(2/3) * (1 - 0.8 * position(3)/500)^2; %variance of wind
     std_w = sqrt(var_w);    %standard deviation
-    %wind = [0, 0, normrnd(0,std_w)]; % zero mean normal distribution of wind
+    randome = normrnd(0,1);
+    disp(randome)
+    wind = [0, 0, randome]; % zero mean normal distribution of wind
 
     V_cop = Lvelocity + cross(Avelocity, (CoP - position));
     V_app = V_cop + wind;
