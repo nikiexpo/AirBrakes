@@ -25,7 +25,7 @@ function dxdt = rocketODE(t, x)
 
     %wind = [0,0,0]; %constant for now
     ref_roll = [0,0,1]; %roll axis
-    CoP = [0,0,-0.3]; %dist from CoM, arbritrary for now -- soruce for discrepancies
+    
     g = [0,0,-9.81]; %gravity
 
     %postion dot
@@ -48,11 +48,12 @@ function dxdt = rocketODE(t, x)
 
     R = quat2rotm(real(quaternion)); % Rotation matrix
     e_roll = (R*ref_roll')'; % compute the roll axis in current orientation
-
+    e_roll = e_roll ./ norm(e_roll);
+    CoP = position + (R*[0,0,-0.3]')'; %dist from CoM, arbritrary for now -- soruce for discrepancies
     var_w = 1.8*2^2*(position(3)/500)^(2/3) * (1 - 0.8 * position(3)/500)^2; %variance of wind
     std_w = sqrt(var_w);    %standard deviation
-    randome = normrnd(0,1);
-    disp(randome)
+    randome = normrnd(0,std_w);
+    %disp(randome)
     wind = [0, 0, randome]; % zero mean normal distribution of wind
 
     V_cop = Lvelocity + cross(Avelocity, (CoP - position));
@@ -79,9 +80,9 @@ function dxdt = rocketODE(t, x)
     %w dot
     
     stability = norm(CoP - position);
-    torque_n = (stability * norm(Fn)) .* cross(e_roll, V_app);
-    torque_damp = (-1*dampDC).*(R*diag([1 1 0])/R)*Avelocity';
-    wdot = Inertia\(torque_damp+torque_n); 
+    torque_n = (stability * norm(Fn)) .* cross(e_roll, n_Vapp);
+    torque_damp = ((-1*dampDC).*(R*diag([1 1 0])/R)*Avelocity')';
+    wdot = Inertia\(torque_damp+torque_n)'; 
 
     dxdt(11) = wdot(1);
     dxdt(12) = wdot(2);
