@@ -13,15 +13,16 @@ function dxdt = rocketODE(t, x)
     %Length = 1.842;
     %RailAngle = 90.0;
     referenceArea = 81.7*10^-4;
-    controlSurfaceArea = 34.5*10^-4;
+    %controlSurfaceArea = 34.5*10^-4;
     %nomAB_DC = 1.17;
     %airBrakePosition = 1.54;
     %maxABLength = 0.021;
     %ABonDC = 0.79;
     %ABoffDC = 0.35;
-    normalDC = 13.6;
+    %normalDC = 13.6;
     dampDC = 4.88;
     %stability = 0.408;
+    CoM = [0, 0, 1.05/2]; %needs to be measured for a rocket
 
     %wind = [0,0,0]; %constant for now
     ref_roll = [0,0,1]; %roll axis
@@ -49,26 +50,26 @@ function dxdt = rocketODE(t, x)
     R = quat2rotm(real(quaternion)); % Rotation matrix
     e_roll = (R*ref_roll')'; % compute the roll axis in current orientation
     e_roll = e_roll ./ norm(e_roll);
-    CoP = position + (R*[0,0,-0.3]')'; %dist from CoM, arbritrary for now -- soruce for discrepancies
+    
+    
     var_w = 1.8*2^2*(position(3)/500)^(2/3) * (1 - 0.8 * position(3)/500)^2; %variance of wind
     std_w = sqrt(var_w);    %standard deviation
     randome = normrnd(0,std_w);
     %disp(randome)
     wind = [0, 0, randome]; % zero mean normal distribution of wind
+    [~, a, ~, rho] = atmoscoesa(position(3));
 
-    V_cop = Lvelocity + cross(Avelocity, (CoP - position));
+    [CN,CoP] = CoeffCalculator();
+    V_cop = Lvelocity + cross(Avelocity, (CoP - CoM));
     V_app = V_cop + wind;
     n_Vapp = V_app ./ norm(V_app);
-    [~, a, ~, rho] = atmoscoesa(position(3));
     
-    u = 1;
-    CD_b = 1.036; %found from rearranging the formula with initial values provided
-    CD_r = 0.2502* 1/sqrt(1 - (norm(V_app)/a)^2); % got the 0.2502 by rearraging using the inital values given (also chceck if V_app should be used)
-    CD_a = CD_r + u*(controlSurfaceArea/referenceArea)*CD_b; %no control input for now
+    u = 0;
+    [CD] = dragCoeffCalculator(norm(V_app),a,u);
 
-    Fa = ((-rho/2)*CD_a*referenceArea* norm(V_app)^2).*e_roll;
-    AoA = acos(dot(n_Vapp, e_roll)); %angle of attack, radians for now
-    CD_n = normalDC * AoA; %asuming normalDC is constant for now, it may not be
+    Fa = ((-rho/2)*CD*referenceArea* norm(V_app)^2).*e_roll;
+    AoA = acos(dot(n_Vapp, e_roll)); %angle of attack, radians 
+    CD_n = CN * AoA; 
 
     Fn = ((rho/2)*CD_n*referenceArea* norm(V_app)^2).*(cross(e_roll, cross(e_roll, n_Vapp)));
     vdot = (1/massB).*(Fn + Fa + Fg);
@@ -79,7 +80,7 @@ function dxdt = rocketODE(t, x)
     %disp(Lvelocity(3));
     %w dot
     
-    stability = norm(CoP - position);
+    stability = norm(CoP - CoM);
     torque_n = (stability * norm(Fn)) .* cross(e_roll, n_Vapp);
     torque_damp = ((-1*dampDC).*(R*diag([1 1 0])/R)*Avelocity')';
     wdot = Inertia\(torque_damp+torque_n)'; 

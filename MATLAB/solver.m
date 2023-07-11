@@ -26,6 +26,9 @@ end
 for n = 4:(length(t)-1)
     p = y(n,:) + h/24.*(55.*feval(func,t(n),y(n,:)) - 59.*feval(func,t(n-1), y(n-1,:)) + 37.*feval(func, t(n-2), y(n-2,:)) - 9.*feval(func, t(n-3), y(n-3,:)));
     y(n+1,:) = y(n,:) + h/24.*(9.*feval(func,t(n+1),p) + 19.*feval(func, t(n), y(n,:)) - 5.*feval(func,t(n-1), y(n-1,:)) + feval(func,t(n-2), y(n-2,:)));
+    if(y(n,10)<0)
+        return;%terminate at apogee
+    end
 end
 
 

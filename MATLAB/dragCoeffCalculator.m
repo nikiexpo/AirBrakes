@@ -1,10 +1,53 @@
-function [dragC] = dragCoeffCalculator()
-% FROM BARROWMAN REPORT
-% Normal force coeff for body, fins, nosecone (per radian)
-CN_NOSE = 2;
-CN_BODY = 0;
+function [CD] = DragCoeffCalculator(V,A,u)
 
+% Dimensions of nose, body and fins (m)
+LEN_NOSECONE = 150*10^-3;
+ROOTCHORD_FIN = 85*10^-3;
+TIPCHORD_FIN = 50*10^-3;
+AVERAGECHORD_FIN = (ROOTCHORD_FIN + TIPCHORD_FIN)/2;
+THICKNESS_FIN = 0.238*10^-3;
+HEIGHT_FIN = 53*10^-3;
+%MIDCHORD_FIN = 53*10^-3;
+%SWEEPANGLE_FIN = 24*pi/180;
+%SWEEPLENGTH_FIN = 23.3*10^-3;
+AREA_FIN = (ROOTCHORD_FIN + TIPCHORD_FIN)/2 * HEIGHT_FIN * 4;
+DIAMETER_BODY = 60*10^-3;
+LEN_ROCKET = 1140*10^-3;
+KINEMATIC_VISC = 1.495*10^-5;
+AREA_FRONTBODY = pi*DIAMETER_BODY^2/4;
+maxABLength = 0.021; % == x, assumption for boundary layer
+CD_0 = 1.17;
+referenceArea = 81.7*10^-4;
+controlSurfaceArea = 34.5*10^-4;
 
-% drag force coeff for body, fins, nosecone
+% drag force coeff for body, fins, nosecone 
+% FROM MANDEL'S TOPICS IN ADVANCED ROCKETRY (PG 447)
+Re_B = V * LEN_ROCKET/KINEMATIC_VISC;
+B = 5*10^5*(0.73/Re_B^(1/5) - 1.328/sqrt(Re_B));
+% if Re_B > 5*10^5
+%     SKINFRICTION_BODY = 0.073/Re_B^(1/5) - B/Re_B;
+% else
+    SKINFRICTION_BODY = 0.073/Re_B^(1/5);
+% end 
+AREA_RATIO = 4*(LEN_ROCKET-LEN_NOSECONE)/DIAMETER_BODY + 2.7*LEN_NOSECONE/DIAMETER_BODY;
+F = 1 + 60/(LEN_ROCKET/DIAMETER_BODY)^3 + 0.0025*LEN_ROCKET/DIAMETER_BODY;
+CD_FB = SKINFRICTION_BODY*F*AREA_RATIO; %forbody body drag
+CD_DB = 0.029*(1/1)^3/sqrt(CD_FB); %forbody base drag
+Re_F = V * AVERAGECHORD_FIN / KINEMATIC_VISC;
+SKINFRICTION_FIN = 1.328/sqrt(Re_F);
+TC_RATIO = THICKNESS_FIN / AVERAGECHORD_FIN;
+CD_F = 2*SKINFRICTION_FIN*(1+2*TC_RATIO)*AREA_FIN/AREA_FRONTBODY;
+Ma = V/A;
+if(Ma<1)
+    CD_TOTAL = (CD_F + CD_DB + CD_FB)*(1/sqrt(1 - Ma^2));
+else
+    CD_TOTAL = (CD_F + CD_DB + CD_FB)*(1/sqrt(Ma^2 - 1));
+end
 
+%AIRBRAKE 
+DIST = maxABLength;
+DELTA = 0.37*DIST*(V*DIST/KINEMATIC_VISC)^(-1/5);
+CD_B = CD_0 * (1 - 0.25* DELTA/maxABLength);
+
+CD = CD_TOTAL + u*(controlSurfaceArea/referenceArea)*CD_B;
 end
