@@ -5,7 +5,7 @@ function dxdt = rocketODE(t, x)
     Lvelocity = [x(8), x(9), x(10)];
     Avelocity = [x(11), x(12), x(13)];
 
-    dxdt = zeros(1,13); %allocate memory
+    dxdt = zeros(13,1); %allocate memory
 
     %constants
     massB = 4.2525;
@@ -64,7 +64,11 @@ function dxdt = rocketODE(t, x)
     V_app = V_cop + wind;
     n_Vapp = V_app ./ norm(V_app);
     
-    u = 0;
+    %cost
+    cost = controller(x(3),800);
+    disp(cost)
+
+    u = cost; %needs a function so evaluate u
     [CD] = dragCoeffCalculator(norm(V_app),a,u);
 
     Fa = ((-rho/2)*CD*referenceArea* norm(V_app)^2).*e_roll;
@@ -88,4 +92,5 @@ function dxdt = rocketODE(t, x)
     dxdt(11) = wdot(1);
     dxdt(12) = wdot(2);
     dxdt(13) = wdot(3);
+    
 end

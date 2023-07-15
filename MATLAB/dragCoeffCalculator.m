@@ -1,4 +1,4 @@
-function [CD] = DragCoeffCalculator(V,A,u)
+function [CD] = dragCoeffCalculator(V,A,u)
 
 % Dimensions of nose, body and fins (m)
 LEN_NOSECONE = 150*10^-3;

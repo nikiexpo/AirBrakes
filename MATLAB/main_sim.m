@@ -19,14 +19,17 @@ clear; clc;
 
 % 160m, 125--160m/s for 800m
 
-x0 = [[0, 0, 160], [ 0.9808 , 0, 0.1951, 0], [0, 0, 125], [0, 0, 0]]; % orientation not great
+
+
+x0 = [[0, 0, 230], [ 0.9808 , 0, 0.1951, 0], [0, 0, 125], [0, 0, 0]]; % orientation not great
 
 tspan = [0 25];
 h = 0.4;
+%u = 0;
 %Use ode15s, ode45 took too long, probably cause the system is stiff
-% options = odeset("RelTol",1e-4, "AbsTol", 1e-4, "Events",@Event);
-% [t,y] = ode15s(@rocketODE, tspan, x0, options);
-[t,y] = solver(@rocketODE, tspan, x0, h);
+options = odeset("RelTol",1e-4, "AbsTol", 1e-4, "Events",@Event);
+ [t,y] = ode45(@(t,y) rocketODE(t,y), tspan, x0, options);
+%[t,y] = solver(@rocketODE, tspan, x0, h);
 %% Plotting
 figure(1)
 plot3(y(:,1), y(:,2), y(:,3))
