@@ -25,6 +25,9 @@ x_min = [0,0,200,0,0,0,0,-500,-500,-500,-100,-100,-100];
 x_max = [inf, inf, inf, 1,1,1,1, 500,500,500, 100,100,100];
 x_tol = [1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2 1e-2];
 
+% final
+goal = 800;
+
 %------------- BEGIN CODE --------------
 % Plant model name, used for Adigator
 InternalDynamics=@AirbrakesRocket_Dynamics_Internal;
@@ -77,11 +80,20 @@ problem.states.xfl=x_min;
 problem.states.xfu=x_max;
 
 % Guess the state trajectories with [x0 xf]
-guess.states(:,1)=[0 18000];
-guess.states(:,2)=[0 0];
-guess.states(:,3)=[m_max m_min];
+guess.states(:,1)=[0 1800];
+guess.states(:,2)=[0 1800];
+guess.states(:,3)=[0 goal];
+guess.states(:,4)=[1 1];
+guess.states(:,5)=[0 0];
+guess.states(:,6)=[0 0];
+guess.states(:,7)=[0 0];
+guess.states(:,8)=[0 0];
+guess.states(:,9)=[0 0];
+guess.states(:,10)=[166 0];
+guess.states(:,11)=[0 0];
+guess.states(:,12)=[0 0];
+guess.states(:,13)=[0 0];
 
-%CHANGWE THE ABOVE VALUES -----<<<<<
 
 
 % Number of control actions N 
@@ -201,7 +213,7 @@ function boundaryCost=E_unscaled(x0,xf,u0,uf,p,t0,tf,vdat)
 %
 %------------- BEGIN CODE --------------
 
-boundaryCost=-xf(1);
+boundaryCost= (1/goal^2)*(xf(3)-goal)^2;
 
 %------------- END OF CODE --------------
 
