@@ -1,4 +1,4 @@
-function dxdt = rocketODE(t, x)
+function dxdt = rocketODE(t, x, data)
     position = [x(1), x(2), x(3)];
     quaternion = [x(4), x(5), x(6), x(7)];
     quaternion = quaternion ./ norm(quaternion); %normalize
@@ -6,28 +6,6 @@ function dxdt = rocketODE(t, x)
     Avelocity = [x(11), x(12), x(13)];
 
     dxdt = zeros(1,13); %allocate memory
-
-    %constants
-    massB = 4.2525;
-    Inertia = diag([0.035, 4.6, 4.6]);
-    %Length = 1.842;
-    %RailAngle = 90.0;
-    referenceArea = 81.7*10^-4;
-    %controlSurfaceArea = 34.5*10^-4;
-    %nomAB_DC = 1.17;
-    %airBrakePosition = 1.54;
-    %maxABLength = 0.021;
-    %ABonDC = 0.79;
-    %ABoffDC = 0.35;
-    %normalDC = 13.6;
-    dampDC = 4.88;
-    %stability = 0.408;
-    CoM = [0, 0, 1.05/2]; %needs to be measured for a rocket
-
-    %wind = [0,0,0]; %constant for now
-    ref_roll = [0,0,1]; %roll axis
-    
-    g = [0,0,-9.81]; %gravity
 
     %postion dot
     dxdt(1) = x(8);   % pos dot is equal to velocity
@@ -45,10 +23,10 @@ function dxdt = rocketODE(t, x)
     dxdt(7) = q_dot(4);
 
     %v dot
-    Fg = massB.*g;
+    Fg = data.massB.*data.g;
 
     R = quat2rotm(real(quaternion)); % Rotation matrix
-    e_roll = (R*ref_roll')'; % compute the roll axis in current orientation
+    e_roll = (R*data.ref_roll')'; % compute the roll axis in current orientation
     e_roll = e_roll ./ norm(e_roll);
     
     
@@ -60,23 +38,23 @@ function dxdt = rocketODE(t, x)
     [~, a, ~, rho] = atmoscoesa(position(3));
 
     [CN,CoP] = CoeffCalculator();
-    V_cop = Lvelocity + cross(Avelocity, (CoP - CoM));
+    V_cop = Lvelocity + cross(Avelocity, (CoP - data.CoM));
     V_app = V_cop + wind;
     n_Vapp = V_app ./ norm(V_app);
     
     %cost
-    cost = controller(x(3),800);
-    disp(cost)
+    %cost = controller(x(3),800);
+    %disp(cost)
 
-    u = cost; %needs a function so evaluate u
-    [CD] = dragCoeffCalculator(norm(V_app),a,u);
+    %u = 0; %needs a function so evaluate u
+    [CD] = dragCoeffCalculator(norm(V_app),a,data);
 
-    Fa = ((-rho/2)*CD*referenceArea* norm(V_app)^2).*e_roll;
+    Fa = ((-rho/2)*CD*data.referenceArea* norm(V_app)^2).*e_roll;
     AoA = acos(dot(n_Vapp, e_roll)); %angle of attack, radians 
     CD_n = CN * AoA; 
 
-    Fn = ((rho/2)*CD_n*referenceArea* norm(V_app)^2).*(cross(e_roll, cross(e_roll, n_Vapp)));
-    vdot = (1/massB).*(Fn + Fa + Fg);
+    Fn = ((rho/2)*CD_n*data.referenceArea* norm(V_app)^2).*(cross(e_roll, cross(e_roll, n_Vapp)));
+    vdot = (1/data.massB).*(Fn + Fa + Fg);
 
     dxdt(8) = vdot(1);
     dxdt(9) = vdot(2);
@@ -84,10 +62,10 @@ function dxdt = rocketODE(t, x)
     %disp(Lvelocity(3));
     %w dot
     
-    stability = norm(CoP - CoM);
+    stability = norm(CoP - data.CoM);
     torque_n = (stability * norm(Fn)) .* cross(e_roll, n_Vapp);
-    torque_damp = ((-1*dampDC).*(R*diag([1 1 0])/R)*Avelocity')';
-    wdot = Inertia\(torque_damp+torque_n)'; 
+    torque_damp = ((-1*data.dampDC).*(R*diag([1 1 0])/R)*Avelocity')';
+    wdot = data.Inertia\(torque_damp+torque_n)'; 
 
     dxdt(11) = wdot(1);
     dxdt(12) = wdot(2);
