@@ -5,7 +5,7 @@ function [dxdt] = AirbrakesRocket_Dynamics_Sim(x,u,p,t,vdat)
     Lvelocity = [x(8), x(9), x(10)];
     Avelocity = [x(11), x(12), x(13)];
 
-    dxdt = zeros(1,13); %allocate memory
+    dxdt = zeros(13,1); %allocate memory
 
     %constants
     massB = 4.2525;

@@ -1,11 +1,11 @@
 function [dxdt] = AirbrakesRocket_Dynamics_Internal(x,u,p,t,vdat)
-    position = [x(1), x(2), x(3)];
-    quaternion = [x(4), x(5), x(6), x(7)];
+    position = [x(:,1), x(:,2), x(:,3)];
+    quaternion = [x(:,4), x(:,5), x(:,6), x(:,7)];
     quaternion = quaternion ./ norm(quaternion); %normalize
-    Lvelocity = [x(8), x(9), x(10)];
-    Avelocity = [x(11), x(12), x(13)];
+    Lvelocity = [x(:,8), x(:,9), x(:,10)];
+    Avelocity = [x(:,11), x(:,12), x(:,13)];
 
-    dxdt = zeros(1,13); %allocate memory
+    dxdt = zeros(size(x)); %allocate memory
 
     %constants
     massB = 4.2525;
@@ -36,13 +36,13 @@ function [dxdt] = AirbrakesRocket_Dynamics_Internal(x,u,p,t,vdat)
 
 
     %quaternion dot
-    q_w = quaternion(1);
-    q_v = quaternion(2:end);
+    q_w = quaternion(:,1);
+    q_v = quaternion(:,2:end);
     q_dot = [0.5.*dot(Avelocity, q_v), 0.5.*(q_w.*Avelocity + cross(Avelocity, q_v))];
-    dxdt(4) = q_dot(1);
-    dxdt(5) = q_dot(2);
-    dxdt(6) = q_dot(3);
-    dxdt(7) = q_dot(4);
+    dxdt(:,4) = q_dot(:,1);
+    dxdt(:,5) = q_dot(:,2);
+    dxdt(:,6) = q_dot(:,3);
+    dxdt(:,7) = q_dot(:,4);
 
     %v dot
     Fg = massB.*g;
@@ -52,12 +52,12 @@ function [dxdt] = AirbrakesRocket_Dynamics_Internal(x,u,p,t,vdat)
     e_roll = e_roll ./ norm(e_roll);
     
     
-    var_w = 1.8*2^2*(position(3)/500)^(2/3) * (1 - 0.8 * position(3)/500)^2; %variance of wind
+    var_w = 1.8*2^2.*(position(:,3)./500).^(2/3) * (1 - 0.8 * position(:,3)./500).^2; %variance of wind
     std_w = sqrt(var_w);    %standard deviation
-    randome = normrnd(0,std_w);
+    randome = normrnd(zeros(size(var_w)),std_w);
     %disp(randome)
-    wind = [0, 0, randome]; % zero mean normal distribution of wind
-    [~, a, ~, rho] = atmoscoesa(position(3));
+    wind = [zeros(size(var_w)), zeros(size(var_w)), randome]; % zero mean normal distribution of wind
+    [~, a, ~, rho] = atmoscoesa(position(:,3));
 
     [CN,CoP] = CoeffCalculator();
     V_cop = Lvelocity + cross(Avelocity, (CoP - CoM));
