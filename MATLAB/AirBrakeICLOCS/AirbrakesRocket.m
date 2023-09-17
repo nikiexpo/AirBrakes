@@ -28,6 +28,7 @@ x_tol = [1e-2 ,1e-2, 1e-2, 1e-2 ,1e-2 ,1e-2, 1e-2 ,1e-2, 1e-2,1e-2 ,1e-2, 1e-2, 
 % final
 goal = 800;
 
+
 %------------- BEGIN CODE --------------
 % Plant model name, used for Adigator
 InternalDynamics=@AirbrakesRocket_Dynamics_Internal;
@@ -138,10 +139,49 @@ problem.constraints.bTol=[];
 
 
 % store the necessary problem parameters used in the functions
-% problem.data.H = H; % [lb]
-% problem.data.D0 = D0; % [lb]
-% problem.data.grav = grav; % [lb]
-% problem.data.c = c; % [lb]
+
+%constants
+problem.data.massB = 4.2525;
+problem.data.Inertia = diag([0.035, 4.6, 4.6]);
+problem.data.Length = 1.842;
+problem.data.RailAngle = 90.0;
+problem.data.referenceArea = 81.7*10^-4;
+problem.data.controlSurfaceArea = 34.5*10^-4;
+problem.data.nomAB_DC = 1.17;
+problem.data.airBrakePosition = 1.54;
+problem.data.maxABLength = 0.021;
+problem.data.ABonDC = 0.79;
+problem.data.ABoffDC = 0.35;
+problem.data.normalDC = 13.6;
+problem.data.dampDC = 4.88;
+problem.data.stability = 0.408;
+problem.data.CoM = [0, 0, 1.05/2]; %needs to be measured for a rocket
+
+% Dimensions of nose, body and fins (m)
+problem.data.LEN_NOSECONE = 150*10^-3;
+problem.data.ROOTCHORD_FIN = 85*10^-3;
+problem.data.TIPCHORD_FIN = 50*10^-3;
+problem.data.AVERAGECHORD_FIN = (85*10^-3 + 50*10^-3)/2;
+problem.data.THICKNESS_FIN = 0.238*10^-3;
+problem.data.HEIGHT_FIN = 53*10^-3;
+problem.data.MIDCHORD_FIN = 53*10^-3;
+problem.data.SWEEPANGLE_FIN = 24*pi/180;
+problem.data.SWEEPLENGTH_FIN = 23.3*10^-3;
+problem.data.AREA_FIN = (85*10^-3 + 50*10^-3)/2 * 53*10^-3* 4;
+problem.data.DIAMETER_BODY = 60*10^-3;
+problem.data.LEN_ROCKET = 1140*10^-3;
+problem.data.KINEMATIC_VISC = 1.495*10^-5;
+problem.data.AREA_FRONTBODY = pi*(60*10^-3)^2/4;
+problem.data.maxABLength = 0.021; % == x, assumption for boundary layer
+problem.data.CD_0 = 1.17;
+problem.data.referenceArea = 81.7*10^-4;
+problem.data.controlSurfaceArea = 34.5*10^-4;
+
+%wind = [0,0,0]; %constant for now
+problem.data.ref_roll = [0,0,1]; %roll axis
+
+problem.data.g = [0,0,-9.81]; %gravity
+problem.data.goal = 800;
 
 % Get function handles and return to Main.m
 problem.data.InternalDynamics=InternalDynamics;
@@ -213,7 +253,7 @@ function boundaryCost=E_unscaled(x0,xf,u0,uf,p,t0,tf,vdat)
 %
 %------------- BEGIN CODE --------------
 
-boundaryCost= (1/goal^2)*(xf(3)-goal)^2;
+boundaryCost= (1/vdat.goal^2)*(vdat.goal - xf(3))^2;
 
 %------------- END OF CODE --------------
 

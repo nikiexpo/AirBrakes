@@ -5,7 +5,7 @@ function dxdt = rocketODE(t, x, data)
     Lvelocity = [x(8), x(9), x(10)];
     Avelocity = [x(11), x(12), x(13)];
 
-    dxdt = zeros(1,13); %allocate memory
+    dxdt = zeros(13,1); %allocate memory
 
     %postion dot
     dxdt(1) = x(8);   % pos dot is equal to velocity
