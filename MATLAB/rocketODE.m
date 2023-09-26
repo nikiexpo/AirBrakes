@@ -30,16 +30,13 @@ function dxdt = rocketODE(t, x, data)
     e_roll = e_roll ./ norm(e_roll);
     
     
-    var_w = 1.8*2^2*(position(3)/500)^(2/3) * (1 - 0.8 * position(3)/500)^2; %variance of wind
-    std_w = sqrt(var_w);    %standard deviation
-    randome = normrnd(0,std_w);
-    %disp(randome)
-    wind = [0, 0, randome]; % zero mean normal distribution of wind
+    %wind stuff removed
+    
     [~, a, ~, rho] = atmoscoesa(position(3));
 
     [CN,CoP] = CoeffCalculator();
     V_cop = Lvelocity + cross(Avelocity, (CoP - data.CoM));
-    V_app = V_cop + wind;
+    V_app = V_cop + data.wind;
     n_Vapp = V_app ./ norm(V_app);
     
     %cost

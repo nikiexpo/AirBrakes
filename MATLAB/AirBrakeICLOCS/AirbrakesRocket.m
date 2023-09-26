@@ -26,7 +26,7 @@ x_max = [inf, inf, inf, 1,1,1,1, 500,500,500, 100,100,100];
 x_tol = [1e-2 ,1e-2, 1e-2, 1e-2 ,1e-2 ,1e-2, 1e-2 ,1e-2, 1e-2,1e-2 ,1e-2, 1e-2, 1e-2];
 
 % final
-goal = 800;
+goal = 1400;
 
 
 %------------- BEGIN CODE --------------
@@ -49,7 +49,7 @@ guess.t0=0;
 
 % Final time. Let tf_min=tf_max if tf is fixed.
 problem.time.tf_min=0;     
-problem.time.tf_max=70; 
+problem.time.tf_max=100; 
 guess.tf=45;
 
 % Parameters bounds. pl=< p <=pu
@@ -77,8 +77,8 @@ problem.states.xConstraintTol=x_tol;
 
 
 % Terminal state bounds. xfl=< xf <=xfu
-problem.states.xfl=x_min;
-problem.states.xfu=x_max;
+problem.states.xfl=[-inf,-inf,-inf,-1,-1,-1,-1,-inf,-inf,-0.2, -inf, -inf, -inf];
+problem.states.xfu=[inf,inf,inf,1,1,1,1,inf,inf,0.2, inf, inf, inf];
 
 % Guess the state trajectories with [x0 xf]
 guess.states(:,1)=[0 1800];
@@ -156,6 +156,7 @@ problem.data.normalDC = 13.6;
 problem.data.dampDC = 4.88;
 problem.data.stability = 0.408;
 problem.data.CoM = [0, 0, 1.05/2]; %needs to be measured for a rocket
+problem.data.wind = [0,0,2];
 
 % Dimensions of nose, body and fins (m)
 problem.data.LEN_NOSECONE = 150*10^-3;
@@ -181,7 +182,7 @@ problem.data.controlSurfaceArea = 34.5*10^-4;
 problem.data.ref_roll = [0,0,1]; %roll axis
 
 problem.data.g = [0,0,-9.81]; %gravity
-problem.data.goal = 800;
+problem.data.goal = goal;
 
 % Get function handles and return to Main.m
 problem.data.InternalDynamics=InternalDynamics;

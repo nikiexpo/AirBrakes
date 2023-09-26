@@ -65,6 +65,9 @@ data.ref_roll = [0,0,1]; %roll axis
 
 data.g = [0,0,-9.81]; %gravity
 data.u = 0.0;
+% var_w = 1.8*2^2*(position(3)/500)^(2/3) * (1 - 0.8 * position(3)/500)^2; %variance of wind
+% std_w = sqrt(var_w);    %standard deviation
+data.wind = [0,0,2];
 
 
 tspan = [0 25];
