@@ -1,4 +1,4 @@
-function [CD] = dragCoeffCalculator(V,A,u,data)
+function [CD, CD_B] = dragCoeffCalculator(V,A,data)
 [Nrows,~] = size(V);
 % drag force coeff for body, fins, nosecone 
 % FROM MANDEL'S TOPICS IN ADVANCED ROCKETRY (PG 447)
@@ -30,5 +30,5 @@ end
 DELTA = 0.37.*data.maxABLength.*(V.*data.maxABLength./data.KINEMATIC_VISC).^(-1/5);
 CD_B = data.CD_0 .* (1 - 0.25.* DELTA./data.maxABLength);
 
-CD = CD_TOTAL + u.*(data.controlSurfaceArea./data.referenceArea).*CD_B;
+CD = CD_TOTAL;
 end

@@ -26,8 +26,9 @@ x_max = [inf, inf, inf, 1,1,1,1, 500,500,500, 100,100,100];
 x_tol = [1e-2 ,1e-2, 1e-2, 1e-2 ,1e-2 ,1e-2, 1e-2 ,1e-2, 1e-2,1e-2 ,1e-2, 1e-2, 1e-2];
 
 % final
-goal = 1400;
+goal = 1500;
 
+[CN,CoP] = CoeffCalculator();
 
 %------------- BEGIN CODE --------------
 % Plant model name, used for Adigator
@@ -49,7 +50,7 @@ guess.t0=0;
 
 % Final time. Let tf_min=tf_max if tf is fixed.
 problem.time.tf_min=0;     
-problem.time.tf_max=100; 
+problem.time.tf_max=300; 
 guess.tf=45;
 
 % Parameters bounds. pl=< p <=pu
@@ -77,7 +78,7 @@ problem.states.xConstraintTol=x_tol;
 
 
 % Terminal state bounds. xfl=< xf <=xfu
-problem.states.xfl=[-inf,-inf,-inf,-1,-1,-1,-1,-inf,-inf,-0.2, -inf, -inf, -inf];
+problem.states.xfl=[-inf,-inf,-inf,-1,-1,-1,-1,-inf,-inf,0.1, -inf, -inf, -inf];
 problem.states.xfu=[inf,inf,inf,1,1,1,1,inf,inf,0.2, inf, inf, inf];
 
 % Guess the state trajectories with [x0 xf]
@@ -110,10 +111,15 @@ problem.inputs.uu=[u_max];
 
 % Bounds on first control action
 problem.inputs.u0l=[u_min];
-problem.inputs.u0u=[u_max]; 
+problem.inputs.u0u=[u_min]; % must start at zero
 
 % Input constraint error bounds
 problem.inputs.uConstraintTol=[0.1];
+problem.inputs.urContraintTol=[0.05];
+
+% Input rate constraints
+problem.inputs.url=[-0.1];
+problem.inputs.uru=[0.1];
 
 % Guess the input sequences with [u0 uf]
 guess.inputs(:,1)=[u_max u_min];
@@ -180,6 +186,11 @@ problem.data.controlSurfaceArea = 34.5*10^-4;
 
 %wind = [0,0,0]; %constant for now
 problem.data.ref_roll = [0,0,1]; %roll axis
+problem.data.CN = CN;
+problem.data.CoP = CoP;
+
+problem.data.cd_table = load("CD.mat");
+problem.data.cdb_table = load("CD_B.mat");
 
 problem.data.g = [0,0,-9.81]; %gravity
 problem.data.goal = goal;
