@@ -12,25 +12,31 @@ clear all;close all;format compact;
 options= problem.settings(100);                  % Get options and solver settings 
 [solution,MRHistory]=solveMyProblem( problem,guess,options);
 
-
+%%
 xx=linspace(solution.T(1,1),solution.tf,1000);
 figure(1)
 subplot(1,2,1)
-plot(xx,speval(solution,'dU',1,xx),'b-' )
+plot(xx,speval(solution,'dU',1,xx),'b-',LineWidth=2 )
 hold on
 plot([solution.T(1,1); solution.tf],[problem.inputs.url, problem.inputs.url],'r--' )
 plot([solution.T(1,1); solution.tf],[problem.inputs.uru, problem.inputs.uru],'r--' )
 xlim([0 solution.tf])
-xlabel('Time [s]');
-ylabel('Deployment Rate [ per sec ]');
+ylim([-0.5 0.5])
+xlabel('Time [s]', FontSize=12, FontWeight='bold');
+ylabel({'Deployment Rate [ per sec ]','(-0.3 \leq du \leq +0.3)'}, FontSize=12, FontWeight='bold');
+title("Deployment rate over time")
 grid on
 hold off
 subplot(1,2,2)
-plot(solution.T,solution.U, 'r-')
-xlabel('Time [s]');
-ylabel('Deployment Level');
-
+plot(solution.T,solution.U, 'r-', LineWidth=2)
+xlabel('Time [s]',FontSize=12, FontWeight='bold');
+ylabel({'Deployment Level','(0 \leq u \leq 1)'} ,FontSize=12, FontWeight='bold');
+title("Deployment level over time (control input)")
+grid on
 figure(2)
-plot(solution.T, solution.X(:,3), LineWidth=2)
-xlabel('Time [s]');
-ylabel('Altitude[ m ]');
+p = plot(solution.T, solution.X(:,3), LineWidth=2);
+datatip(p,xx(end),solution.X(end,3))
+xlabel('Time [s]',FontSize=12, FontWeight='bold');
+ylabel({'Altitude[ m ]', '(Target = 4400m)'}, FontSize=12, FontWeight='bold');
+grid on
+title("Altitude over time")
