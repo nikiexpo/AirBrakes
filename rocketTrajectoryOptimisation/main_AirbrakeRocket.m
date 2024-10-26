@@ -8,7 +8,7 @@
 % iclocs@imperial.ac.uk
 %% Solve the problem
 clear all;close all;format compact;
-[problem,guess]=Airbrake3;          % Fetch the problem definition
+[problem,guess]=Airbrake2;          % Fetch the problem definition
 options= problem.settings(100);                  % Get options and solver settings 
 [solution,MRHistory]=solveMyProblem( problem,guess,options);
 
@@ -37,6 +37,6 @@ figure(2)
 p = plot(solution.T, solution.X(:,3), LineWidth=2);
 datatip(p,xx(end),solution.X(end,3))
 xlabel('Time [s]',FontSize=12, FontWeight='bold');
-ylabel({'Altitude[ m ]', '(Target = 4400m)'}, FontSize=12, FontWeight='bold');
+ylabel({'Altitude[ m ]'}, FontSize=12, FontWeight='bold');
 grid on
-title("Altitude over time")
+title(sprintf("Altitude over time with target set to %d", problem.data.goal))

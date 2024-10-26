@@ -1,5 +1,4 @@
-% For RocketPy test
-function [problem,guess] = Airbrake3
+function [problem,guess] = Airbrake2
 %myProblem - Template file for optimal control problem definition
 %
 %Syntax:  [problem,guess] = myProblem
@@ -33,12 +32,12 @@ SimDynamics=@AirbrakesRocket_Dynamics_Sim;
 % (optional) customized call back function
 %problem.callback=@callback_myProblem;
 
-x0 = [0,0,654.8,1,0,0,0,0,0,281,0,0,0];
-x_min = [0,0,0,-1,-1,-1,-1,-500,-500,-500,-100,-100,-100];
+x0 = [0,0,200,1,0,0,0,0,0,166,0,0,0];
+x_min = [0,0,200,0,0,0,0,-500,-500,-500,-100,-100,-100];
 x_max = [inf, inf, inf, 1,1,1,1, 500,500,500, 100,100,100];
 x_tol = [1 ,1, 1, 1e-2 ,1e-2 ,1e-2, 1e-2 ,1, 1,1,1, 1, 1];
 
-goal = 4400;
+goal = 1550;
 [CN,CoP] = CoeffCalculator();
 % Settings file
 problem.settings=@settings_AirbrakesRocket;
@@ -52,7 +51,7 @@ guess.t0=0;
 % Final time. Let tf_min=tf_max if tf is fixed.
 problem.time.tf_min=-inf;     
 problem.time.tf_max=inf; 
-guess.tf=25.9;
+guess.tf=20;
 
 % Parameters bounds. pl=< p <=pu
 problem.parameters.pl=[];
@@ -88,16 +87,16 @@ problem.states.xfu=[inf,inf,inf,1,1,1,1,inf,inf,0.2, inf, inf, inf];
 
 % Guess the state trajectories with [x0 ... xf]
 guess.time=[t0 20];
-guess.states(:,1)=[0 661];
-guess.states(:,2)=[0 220];
-guess.states(:,3)=[654 goal];
+guess.states(:,1)=[0 1800];
+guess.states(:,2)=[0 1800];
+guess.states(:,3)=[0 goal];
 guess.states(:,4)=[1 1];
 guess.states(:,5)=[0 0];
 guess.states(:,6)=[0 0];
 guess.states(:,7)=[0 0];
 guess.states(:,8)=[0 0];
 guess.states(:,9)=[0 0];
-guess.states(:,10)=[281 0];
+guess.states(:,10)=[166 0];
 guess.states(:,11)=[0 0];
 guess.states(:,12)=[0 0];
 guess.states(:,13)=[0 0];
@@ -151,48 +150,50 @@ problem.constraints.bTol=[];
 
 % store the necessary problem parameters used in the functions
 %constants
-problem.data.massB = 19.4;
-problem.data.Inertia = diag([0.034, 6.3, 6.3]);
-problem.data.Length = (1.19+0.719+0.55)*1;
+problem.data.massB = 4.2525;
+problem.data.Inertia = diag([0.035, 4.6, 4.6]);
+problem.data.Length = 1.842;
 problem.data.RailAngle = 90.0;
-problem.data.referenceArea = 0.01266;
-problem.data.controlSurfaceArea = (34.5/81.7)*0.01266;
-problem.data.nomAB_DC = 1.27;
-problem.data.airBrakePosition = (1.54/1.8)*(1.19+0.719+0.55);
-problem.data.maxABLength = 0.030;
+problem.data.referenceArea = 81.7*10^-4;
+problem.data.controlSurfaceArea = 34.5*10^-4;
+problem.data.nomAB_DC = 1.17;
+problem.data.airBrakePosition = 1.54;
+problem.data.maxABLength = 0.021;
 problem.data.ABonDC = 0.79;
 problem.data.ABoffDC = 0.35;
 problem.data.normalDC = 13.6;
 problem.data.dampDC = 4.88;
 problem.data.stability = 0.408;
-problem.data.CoM = [0, 0, 0.719+0.55]; %needs to be measured for a rocket
-problem.data.wind = [0,0,3.85];
+problem.data.CoM = [0, 0, 1.05/2]; %needs to be measured for a rocket
+problem.data.wind = [0,0,2];
 
 % Dimensions of nose, body and fins (m)
-problem.data.LEN_NOSECONE = 558.29*10^-3;
-problem.data.ROOTCHORD_FIN = 120*10^-3;
-problem.data.TIPCHORD_FIN = 40*10^-3;
-problem.data.AVERAGECHORD_FIN = (120*10^-3 + 40*10^-3)/2;
+problem.data.LEN_NOSECONE = 150*10^-3;
+problem.data.ROOTCHORD_FIN = 85*10^-3;
+problem.data.TIPCHORD_FIN = 50*10^-3;
+problem.data.AVERAGECHORD_FIN = (85*10^-3 + 50*10^-3)/2;
 problem.data.THICKNESS_FIN = 0.238*10^-3;
-problem.data.HEIGHT_FIN = 100*10^-3;
-problem.data.MIDCHORD_FIN = 80*10^-3;
-problem.data.SWEEPANGLE_FIN = 80*pi/180;
-problem.data.SWEEPLENGTH_FIN = 80*10^-3;
-problem.data.AREA_FIN = (120*10^-3 + 40*10^-3)/2 * 100*10^-3* 4;
-problem.data.DIAMETER_BODY = 127/1000;
-problem.data.LEN_ROCKET = (1.19+0.719+0.55)*1;
+problem.data.HEIGHT_FIN = 53*10^-3;
+problem.data.MIDCHORD_FIN = 53*10^-3;
+problem.data.SWEEPANGLE_FIN = 24*pi/180;
+problem.data.SWEEPLENGTH_FIN = 23.3*10^-3;
+problem.data.AREA_FIN = (85*10^-3 + 50*10^-3)/2 * 53*10^-3* 4;
+problem.data.DIAMETER_BODY = 60*10^-3;
+problem.data.LEN_ROCKET = 1140*10^-3;
 problem.data.KINEMATIC_VISC = 1.495*10^-5;
 problem.data.AREA_FRONTBODY = pi*(60*10^-3)^2/4;
 problem.data.maxABLength = 0.021; % == x, assumption for boundary layer
 problem.data.CD_0 = 1.17;
+problem.data.referenceArea = 81.7*10^-4;
+problem.data.controlSurfaceArea = 34.5*10^-4;
 
 %wind = [0,0,0]; %constant for now
 problem.data.ref_roll = [0,0,1]; %roll axis
 problem.data.CN = CN;
 problem.data.CoP = CoP;
 
-problem.data.cd_table = load("CD.mat");
-problem.data.cdb_table = load("CD_B.mat");
+% problem.data.cd_table = load("CD.mat");
+% problem.data.cdb_table = load("CD_B.mat");
 
 problem.data.g = [0,0,-9.81]; %gravity
 problem.data.goal = goal;

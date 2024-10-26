@@ -1,24 +1,19 @@
 # AirBrakes
-## Simulation 
-Rocket model (ODE) for the simulator is ready, can be found in the MATLAB folder
 
-1. The coefficient of damping still needs work but the rest are reasonably accurate. 
-2. Needs more testing 
+Trajectroy Optimisation for precise apogee control using variable drag system i.e. AirBrakes. 
 
-The control algorithm needs to be added.
+## Optimal Control Problem
 
-SO : Idea #1 : 
-1. Create a trajectory with boundary condition apogee 800m
-2. trajectory is based on vertical speed and height 
-3. LQR to follow this trajectory
+The problem was formulated as an optimal control problem with 6dof nonlinear model of an amatuer rocket. The dynamics had 13 states including 3x1 vector of position, linear and angular velocity and 4x1 quaternion vector. 
+The model itself was taken from the appendix of this [paper](https://www.eucass.eu/doi/EUCASS2019-0388.pdf) by Thomas Lew et al.
 
+## Running the code
 
+The problem is solved using [ICLOCS2](http://www.ee.ic.ac.uk/ICLOCS/) and note that the code also uses functions from UAV toolbox (although this can be avoided by writing a few extra lines of code). 
+Airbrake2 and Airbrake3 are two different examples with different rocket parameters and targets. 
 
+## Future work
 
-RocketPy:
-    1. No support for airbrakes as of now
-    2. So probably need to edit source for this (difficult)
-    3. Need to find a trajectory optimisation tool box for this in python
-
+I no longer plan to pursue building a rocket to test this however the plan was to run this as a monte-carlo simulation and then store the solution as lookup table which will be used by the microcontroller online. 
 
 
